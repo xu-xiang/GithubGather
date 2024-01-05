@@ -1,0 +1,76 @@
+### 获取特定用户的基本信息
+GET http://localhost:9000/users/{{username}}
+Content-Type: application/json
+
+### 测试获取指定用户所有star的项目(deep_fetch是代理参数，不会传递给Github，代理收到后会判断响应是列表或字典然后自动遍历数据)
+GET http://localhost:9000/users/{{username}}/starred?deep_fetch=true&per_page=100
+Content-Type: application/json
+
+### 获取特定仓库信息
+GET http://localhost:9000/repos/{{username}}/{{repo}}
+Content-Type: application/json
+
+### 深度爬取特定用户的所有仓库(遍历翻页所有数据，per_page默认为100，github最大翻页数，可根据实际情况调整)
+GET http://localhost:9000/users/{{username}}/repos?deep_fetch=true&per_page=100
+Accept: application/json
+
+### 深度爬取特定用户的所有仓库(限制爬取数量，例如每页1条，一共只翻2页)
+GET http://localhost:9000/users/{{username}}/repos?deep_fetch=true&per_page=1&max_pages=2
+Accept: application/json
+
+### 深度爬取特定项目的所有提交记录
+GET http://localhost:9000/repos/{{username}}/{{repo}}/commits?deep_fetch=true
+Accept: application/json
+
+### 深度爬取特定项目的所有issues
+GET http://localhost:9000/repos/{{username}}/{{repo}}/issues?deep_fetch=true&per_page=100
+Accept: application/json
+
+### 深度爬取特定用户的所有gists并过滤字段(fields参数不会传递给github，是本程序降低返回数据量的过滤参数，支持Json数据嵌套)
+GET http://localhost:9000/users/{{username}}/gists?deep_fetch=true&fields=id,files.Email.filename,files.Email.type
+Accept: application/json
+
+### 搜索machine+learning相关的项目并遍历翻页获取所有结果
+GET http://localhost:9000/search/repositories?q=machine+learning&deep_fetch=true&fields=items.name,items.description
+Accept: application/json
+
+### 深度爬取特定项目的所有watchers并过滤字段
+GET http://localhost:9000/repos/{{username}}/{{repo}}/subscribers?deep_fetch=true&fields=id,login
+Accept: application/json
+
+### 搜索特定关键词的issues（深度爬取）
+GET http://localhost:9000/search/issues?q=docker&deep_fetch=true
+Accept: application/json
+
+### 联动请求(使用第一个请求中获取的数据进行第二次请求，并聚合结果返回)
+### 获取特定用户的所有仓库并爬取每个仓库的Readme文件（{repo_name}是基于第一次爬虫数据的动态取值），并过滤结果字段
+GET http://localhost:9000/users/{{username}}/repos?linked_readme=/repos/{full_name}/readme&fields=id,owner.login,linked_readme.name,linked_readme.content
+
+
+### 深度爬取特定项目的所有tags并执行联动请求（获取tag对应的commit信息）
+GET http://localhost:9000/repos/{{username}}/{{repo}}/tags?deep_fetch=true&
+    linked_commit=/repos/{{username}}/{{repo}}/git/commits/{commit_sha}
+Accept: application/json
+
+### 获取特定项目的所有stargazers（深度爬取）并执行联动请求（获取star用户的followers）
+GET http://localhost:9000/repos/{{username}}/{{repo}}/stargazers?deep_fetch=true&
+    linked_followers=/users/{stargazer_login}/followers
+Accept: application/json
+
+### 获取特定项目的所有订阅者（深度爬取）并执行联动请求（获取订阅者的项目）
+GET http://localhost:9000/repos/{{username}}/{{repo}}/subscribers?deep_fetch=true&
+    linked_repos=/users/{subscriber_login}/repos
+Accept: application/json
+
+### 其他场景
+### 获取特定用户的所有public organizations（深度爬取）
+GET http://localhost:9000/users/{{username}}/orgs?deep_fetch=true
+Accept: application/json
+
+### 获取特定组织的所有项目（深度爬取）
+GET http://localhost:9000/orgs/{{orgname}}/repos?deep_fetch=true&per_page=100
+Accept: application/json
+
+### 获取特定项目的所有forks（深度爬取）
+GET http://localhost:9000/repos/{{username}}/{{repo}}/forks?deep_fetch=true&per_page=100
+Accept: application/json
