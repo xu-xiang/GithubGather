@@ -140,7 +140,6 @@ GET http://localhost:9000/users/{{username}}/repos?linked_readme=/repos/{full_na
 #### 搜索machine+learning相关的项目并遍历翻页获取所有结果
 
 ```http request
-### 搜索machine+learning相关的项目并遍历翻页获取所有结果
 GET http://localhost:9000/search/repositories?q=machine+learning&deep_fetch=true&fields=items.name,items.description
 Accept: application/json
 ```
